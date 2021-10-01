@@ -10,7 +10,7 @@ This Multi-Source Interference Task (MSIT) was built specifically for children a
 - [x] Add functionality to generate randomized trial lists
     * Works by creating an array of 0s and 1s (congruent, incongruent), shuffling, sampling from stim categories, and storing in a list of dicts. 
 - [x] Add feedback during practice trials
-    * For list('122'), find value with count == 1 and look up correspondence with keyboard arrow button press
+    * For `list('122')`, find value with `count == 1` and look up correspondence with keyboard arrow button press
 - [ ] Liz to refine instructions text
 - [ ] Insert flashing square for photo diode
 - [ ] Set up parallel port I/O for registering button presses
