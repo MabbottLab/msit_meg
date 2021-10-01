@@ -100,7 +100,8 @@ task_trials = [{'stim': randchoice(all_control_stim)} if task_trials[x] == 1 \
                for x in np.arange(200)]
 
 # set up dict of correct responses
-key_dict = {'left': '1', 'down': '2', 'right': '3'}
+key_dict = {'left': '1', 'down': '2', 'right': '3', \
+            '1': 'left', '2': 'down', '3': 'right'}
 
 # Initialize components for Routine "instr_prac"
 instr_pracClock = core.Clock()
@@ -421,8 +422,7 @@ for thisTrials_prac in trials_prac:
                     feedback.setColor('white')
                 else:
                     key_resp.corr = 0
-                    feedback.setText("Oops, incorrect :(")
-                    feedback.setColor('red')
+                    feedback.setText("Nice try.\nThe correct answer is %s"%(key_dict[val[counts == 1][0]]))
         
         # check for quit (typically the Esc key)
         if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
@@ -454,11 +454,7 @@ for thisTrials_prac in trials_prac:
     # check responses
     if key_resp.keys in ['', [], None]:  # No response was made
         key_resp.keys = None
-        # was no response the correct answer?!
-        if str('').lower() == 'none':
-           key_resp.corr = 1;  # correct non-response
-        else:
-           key_resp.corr = 0;  # failed to respond (incorrectly)
+        key_resp.corr = 0;  # correct non-response
     # store data for trials_prac (TrialHandler)
     trials_prac.addData('key_resp.keys',key_resp.keys)
     trials_prac.addData('key_resp.corr', key_resp.corr)
@@ -468,9 +464,6 @@ for thisTrials_prac in trials_prac:
     trials_prac.addData('key_resp.stopped', key_resp.tStopRefresh)
     thisExp.nextEntry()
     
-# completed 20.0 repeats of 'trials_prac'
-
-
 # ------Prepare to start Routine "instr_task"-------
 continueRoutine = True
 # update component parameters for each repeat
