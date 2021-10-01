@@ -51,7 +51,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='C:\\Users\\julie tseng\\msit\\MSIT_v2021-1-4_from-scratch.py',
+    originPath='C:\\Users\\julie tseng\\msit_meg\\MSIT_v2021-1-4_keyboard.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -282,7 +282,7 @@ thisExp.addData('instr_text.stopped', instr_text.tStopRefresh)
 routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
-trials_prac = data.TrialHandler(nReps=20.0, method='sequential', 
+trials_prac = data.TrialHandler(nReps=1.0, method='sequential', 
     extraInfo=expInfo, originPath=-1,
     trialList=prac_trials,
     seed=None, name='trials_prac')
@@ -548,6 +548,8 @@ while continueRoutine:
     # refresh the screen
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
+
+print("Moving onto the actual task.")
 
 # -------Ending Routine "instr_task"-------
 for thisComponent in instr_taskComponents:

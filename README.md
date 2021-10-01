@@ -11,7 +11,7 @@ This Multi-Source Interference Task (MSIT) was built specifically for children a
     * Works by creating an array of 0s and 1s (congruent, incongruent), shuffling, sampling from stim categories, and storing in a list of dicts. 
 - [x] Add feedback during practice trials
     * For `list('122')`, find value with `count == 1` and look up correspondence with keyboard arrow button press
-- [ ] Liz to refine instructions text
+- [ ] Liz to refine instructions text and other aesthetics (e.g., background colour, text size)
 - [ ] Insert flashing square for photo diode
 - [ ] Set up parallel port I/O for registering button presses
 - [ ] Set up triggers to be sent to MEG acquisition system
