@@ -44,6 +44,10 @@ Fixation + grating (0.5s) -> Triplet presentation (3.0s) -> Blank screen (0.5s)
 | Incongruent stim | 221, 331 <br> 212, 313 <br> 112, 211 <br> 332, 233 <br> 311, 131 <br> 322, 232 |
 | Grating stim | Circular, phase 0.0, spatial frequency 3 |
 
+Note that:
+* It's possible for the same two triplets to appear in a row (e.g., fixation -> '100' -> blank -> fixation -> '100')
+* Only the first button/key response is checked/registered
+
 ## References
 
 Gaetz, W., Liu, C., Zhu, H., Bloy, L., & Roberts, T. P. (2013). Evidence for a motor gamma-band network governing response interference. _Neuroimage_, 74, 245-253.
