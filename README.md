@@ -2,6 +2,22 @@
 
 This Multi-Source Interference Task (MSIT) was built specifically for children and use in an MEG scanner using PsychoPy3 (v2021.1.4). Feel free to [contact me](julie.tseng@sickkids.ca) if you have any questions.
 
+## To do list
+
+- [x] Liz to identify task structure
+    * Ended up differing from the MSIT implementation I found on Github.
+- [x] Build skeleton of task from scratch on PsychoPy3 Builder
+- [x] Add functionality to generate randomized trial lists
+    * Works by creating an array of 0s and 1s (congruent, incongruent), shuffling, sampling from stim categories, and storing in a list of dicts. 
+- [x] Add feedback during practice trials
+    * For list('122'), find value with count == 1 and look up correspondence with keyboard arrow button press
+- [ ] Liz to refine instructions text
+- [ ] Insert flashing square for photo diode
+- [ ] Set up parallel port I/O for registering button presses
+- [ ] Set up triggers to be sent to MEG acquisition system
+- [ ] Confirm lower left field visual grating stim parameters
+- [ ] Make version compatible with PsychoPy2
+
 ## Task configuration
 
 ### Breakdown:
