@@ -425,7 +425,6 @@ for thisTrials_prac in trials_prac:
             feedback.setAutoDraw(False)
     
         # *key_resp* updates
-        waitOnFlip = False
         if key_resp.status == NOT_STARTED and t >= TRIPLET_START_TIME:
             # keep track of start time/frame for later
             key_resp.frameNStart = frameN  # exact frame index
@@ -440,13 +439,22 @@ for thisTrials_prac in trials_prac:
             key_resp.frameNStop = frameN  # exact frame index
             key_resp.status = FINISHED
         if key_resp.status == STARTED:
-            theseKeys = event.getKeys(keyList=['left', 'down', 'right'])
+            if VPIXX:
+                response = readButtons()
+                if response != 'none':
+                    sendTrigger(buttonOut)
+                    logging.log(level=logging.EXP.\
+                                msg = "Button box received: %s"&(response))
+                    theseKeys.append(response)
+            else:
+                theseKeys = event.getKeys(keyList=['left', 'down', 'right'])
+                
             if len(theseKeys) > 0:
                 key_resp.keys = theseKeys[-1]  # just the last key pressed
                 key_resp.rt = key_resp.clock.getTime()
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True)
-                if key_dict[key_resp.keys] == val[counts == 1]:
+                if key_dict[key_resp.keys] == val[counts == 1] or key_resp.keys == val[counts == 1]:
                     key_resp.corr = 1
                     feedback.setText("Correct!")
                     feedback.setColor('white')
