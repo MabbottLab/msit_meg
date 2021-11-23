@@ -15,7 +15,7 @@ from __future__ import absolute_import, division
 
 from psychopy import locale_setup
 from psychopy import prefs
-from psychopy import sound, gui, visual, core, data, event, logging, clock, colors
+from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, parallel
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 
@@ -59,6 +59,35 @@ logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a f
 endExpNow = False  # flag for 'escape' or other condition => quit the exp
 frameTolerance = 0.001  # how close to onset before 'same' frame
 
+# ---------- PARALLEL PORT SETUP ---------------------------------------------#
+VPIXX = 0   # set to 1 if testing in the MEG
+
+if VPIXX:
+    # BUTTON BOX RESPONSES----------------------------------------------------#
+    BBOX_1_OR_2 = parallel.ParallelPort(0x3048)
+    BBOX_3 = parallel.ParallelPort(0x3048+2)
+    
+    # return button press
+    def readButtons():
+        if BBOX_1_OR_2.readPin(2):
+            return('1')
+        elif BBOX_1_OR_2.readPin(3):
+            return('2')
+        elif BBOX_3.readPin(2):
+            return('3')
+        else:
+            return('none')
+
+    # SENDING OUT info about trials--------------------------------------------#
+    MEG_ACQ         = parallel.ParallelPort(address=0x4048)
+    button_out      = 4
+
+    # send signal to ACQ
+    def sendTrigger(triggerVal):
+        MEG_ACQ.setData(int(triggerVal))
+        core.wait(0.01)
+        MEG_ACQ.setData(0)
+
 # Start Code - component code to be run after the window creation
 
 # Setup the Window
@@ -80,8 +109,7 @@ defaultKeyboard = keyboard.Keyboard()
 
 # setup instruction slides
 prac_instr = [{'imgidx': _thisDir + '\\images\\Slide' + str(x+1) + '.png'} \
-                for x in np.arange(12)]
-print(prac_instr)
+                for x in np.arange(15)]
 
 # Declare stimuli types
 all_control_stim=['100','020','003']
@@ -152,7 +180,7 @@ key_resp = keyboard.Keyboard()
 # Initialize components for Routine "instr_task"
 instr_taskClock = core.Clock()
 task_instruct = visual.ImageStim(win=win, name='task_instruct',
-                image='images/Slide14.PNG', mask=None,
+                image='images/Slide16.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb', opacity=None,
                 flipHoriz=False, flipVert=False,
@@ -187,7 +215,7 @@ key_resp_4 = keyboard.Keyboard()
 # Initialize components for Routine "thx"
 thxClock = core.Clock()
 thanks = visual.ImageStim(win=win, name='thanks',
-                image='images/Slide15.PNG', mask=None,
+                image='images/Slide17.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb', opacity=None,
                 flipHoriz=False, flipVert=False,
@@ -438,11 +466,17 @@ for thisTrials_prac in trials_prac:
                 win.timeOnFlip(key_resp, 'tStopRefresh')  # time at next scr refresh
                 key_resp.status = FINISHED
         if key_resp.status == STARTED and not waitOnFlip:
-            theseKeys = key_resp.getKeys(keyList=['left', 'down', 'right'], waitRelease=False)
-            _key_resp_allKeys.extend(theseKeys)
-            if len(_key_resp_allKeys):
-                key_resp.keys = _key_resp_allKeys[0].name  # just the first key pressed
-                key_resp.rt = _key_resp_allKeys[0].rt
+            response = readButtons()
+            if response != 'none':
+                sendTrigger(buttonOut)
+                logging.log(level=logging.EXP.\
+                            msg="Button box received: %s"%(response))
+                            theseKeys.append(response)
+
+            if len(theseKeys) > 0:
+                key_resp.keys = theseKeys[0]  # just the first key pressed
+                key_resp.rt = key_resp.clock.getTime()
+                
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True)
                 if key_dict[key_resp.keys] == val[counts == 1]:
@@ -451,7 +485,7 @@ for thisTrials_prac in trials_prac:
                     feedback.setColor('white')
                 else:
                     key_resp.corr = 0
-                    feedback.setText("Nice try.\nThe correct answer is %s"%(key_dict[val[counts == 1][0]]))
+                    feedback.setText("Nice try.\nThe correct answer is %s."%(key_dict[val[counts == 1][0]]))
         
         # check for quit (typically the Esc key)
         if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
