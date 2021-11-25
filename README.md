@@ -28,7 +28,7 @@ Instructions -> Practice: 20 trials (randomized) -> Checkpoint -> Task: 200 tria
 
 ### Trial breakdown:
 ```
-Fixation + grating (0.5s) -> Triplet presentation (3.0s) -> Blank screen (0.5s)
+Fixation (0.5s) -> Triplet presentation + grating (3.0s) -> Blank screen (0.5s)
 ```
 
 ### Additional info:
