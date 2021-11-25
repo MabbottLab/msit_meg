@@ -115,11 +115,11 @@ if VPIXX:
         MEG_ACQ.setData(0)
 
 #------------TASK PARAMETERS--------------------------------------------------#
-FIX_START_TIME = 0.0
-FIX_DURATION = 0.1
-TRIPLET_START_TIME = 0.1
-TRIPLET_DURATION = 0.1 # set to lower value to debug
-ROUTINE_DURATION = 0.200 # set to 4.0000 usually
+FIX_START_TIME = 0.5
+FIX_DURATION = 0.5
+TRIPLET_START_TIME = 1.0
+TRIPLET_DURATION = 3.0 # set to lower value to debug
+ROUTINE_DURATION = 4.000 # set to 4.0000 usually
 
 TOTAL_PRACTICE = 20 # 10+10 congruent/incogruent trials
 TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
@@ -177,7 +177,7 @@ fix = visual.TextStim(win=win, name='fix',
     depth=0.0);
 grating = visual.GratingStim(
     win=win, name='grating',units='height', 
-    tex='sin', mask='circle',
+    tex='sin', 
     ori=0.0, pos=(-0.7,-0.3), size=[0.2], sf=3.0, phase=0.0,
     color=[1,1,1], colorSpace='rgb',
     contrast=1.0, # blendmode='avg',
@@ -219,7 +219,7 @@ fix_2 = visual.TextStim(win=win, name='fix',
     depth=0.0);
 grating_2 = visual.GratingStim(
     win=win, name='grating',units='height', 
-    tex='sin', mask='circle',
+    tex='sin', 
     ori=0.0, pos=(-0.7,-0.3), size=[0.2], sf=3.0, phase=0.0,
     color=[1,1,1], colorSpace='rgb',
     contrast=1.0, # blendmode='avg',
@@ -402,12 +402,12 @@ for thisTrials_prac in trials_prac:
             fix.setAutoDraw(False)
     
         # *grating* updates
-        if grating.status == NOT_STARTED and t >= FIX_START_TIME:
+        if grating.status == NOT_STARTED and t >= TRIPLET_START_TIME:
             # keep track of start time/frame for later
             grating.frameNStart = frameN  # exact frame index
             grating.tStart = t  # local t and not account for scr refresh
             grating.setAutoDraw(True)
-        if grating.status == STARTED and t >= FIX_START_TIME + TRIPLET_DURATION:
+        if grating.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
             # keep track of stop time/frame for later
             grating.tStop = t  # not accounting for scr refresh
             grating.frameNStop = frameN  # exact frame index
@@ -640,12 +640,12 @@ for thisTrials_task in trials_task:
             fix_2.setAutoDraw(False)
     
         # *grating_2* updates
-        if grating_2.status == NOT_STARTED and t >= FIX_START_TIME:
+        if grating_2.status == NOT_STARTED and t >= TRIPLET_START_TIME:
             # keep track of start time/frame for later
             grating_2.frameNStart = frameN  # exact frame index
             grating_2.tStart = t  # local t and not account for scr refresh
             grating_2.setAutoDraw(True)
-        if grating_2.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
+        if grating_2.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
             # is it time to stop? (based on global clock, using actual start)
             # keep track of stop time/frame for later
             grating_2.tStop = t  # not accounting for scr refresh
