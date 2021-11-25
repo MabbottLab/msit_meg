@@ -91,7 +91,7 @@ if VPIXX:
     BBOX_1_OR_2 = parallel.ParallelPort(0x3048)
     BBOX_3 = parallel.ParallelPort(0x3048+2)
     
-    # return button press and send signal to ACQ
+    # return button press
     def readButtons():
         if BBOX_1_OR_2.readPin(2):
             return('1')
@@ -104,9 +104,7 @@ if VPIXX:
 
     # SENDING OUT info about trials--------------------------------------------#
     MEG_ACQ         = parallel.ParallelPort(address=0x4048)
-    triplet_congruent     = 1
-    triplet_incongruent   = 2
-    button_out            = [4, 8, 16]
+    button_out      = 4
 
     # send signal to ACQ
     def sendTrigger(triggerVal):
@@ -118,8 +116,8 @@ if VPIXX:
 FIX_START_TIME = 0.0
 FIX_DURATION = 0.1
 TRIPLET_START_TIME = 0.1
-TRIPLET_DURATION = 0.1 # set to lower value to debug
-ROUTINE_DURATION = 0.200 # set to 4.0000 usually
+TRIPLET_DURATION = 0.5 # set to lower value to debug
+ROUTINE_DURATION = 0.600 # set to 4.0000 usually
 
 TOTAL_PRACTICE = 20 # 10+10 congruent/incogruent trials
 TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
@@ -134,19 +132,19 @@ all_int_stim=['221','212','331','313','112','211','332','233','131','311',\
     '232','322']
 
 # Set up practice and task trial condition order
-prac_trials_type = np.concatenate((np.ones(10), np.zeros(10))) # generate 1s, 0s
-task_trials_type = np.concatenate((np.ones(100), np.zeros(100)))
-shuffle(prac_trials_type) # shuffle it up
-shuffle(task_trials_type)
+prac_trials = np.concatenate((np.ones(10), np.zeros(10))) # generate 1s, 0s
+task_trials = np.concatenate((np.ones(100), np.zeros(100)))
+shuffle(prac_trials) # shuffle it up
+shuffle(task_trials)
 
 # fill in resampled order as list of dicts
-prac_trials = [{'stim': randchoice(all_control_stim)} if prac_trials_type[x] == 1 \
+prac_trials = [{'stim': randchoice(all_control_stim)} if prac_trials[x] == 1 \
                 else {'stim': randchoice(all_int_stim)} \
-                for x in np.arange(TOTAL_PRACTICE)]
+                for x in np.arange(20)]
 
-task_trials = [{'stim': randchoice(all_control_stim)} if task_trials_type[x] == 1 \
+task_trials = [{'stim': randchoice(all_control_stim)} if task_trials[x] == 1 \
                else {'stim': randchoice(all_int_stim)} \
-               for x in np.arange(TOTAL_TASK)]
+               for x in np.arange(200)]
 
 # set up dict of correct responses
 key_dict = {'left': '1', 'down': '2', 'right': '3', \
@@ -352,7 +350,6 @@ if thisTrials_prac != None:
     for paramName in thisTrials_prac:
         exec('{} = thisTrials_prac[paramName]'.format(paramName))
 
-type_counter = 0
 for thisTrials_prac in trials_prac:
     currentLoop = trials_prac
     # abbreviate parameter names if possible (e.g. rgb = thisTrials_prac.rgb)
@@ -419,14 +416,6 @@ for thisTrials_prac in trials_prac:
             triplets.frameNStart = frameN  # exact frame index
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
-            
-            # send trigger for trial type
-            if prac_trials_type[type_counter]: # type 1 = control
-                win.callOnFlip(sendTrigger, triplet_congruent)
-            else:
-                win.callOnFlip(sendTrigger, triplet_incongruent)
-            type_counter += 1
-
             feedback.setText('')
             feedback.setAutoDraw(True)
         elif triplets.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
@@ -438,6 +427,7 @@ for thisTrials_prac in trials_prac:
             feedback.setAutoDraw(False)
     
         # *key_resp* updates
+        waitOnFlip = False
         if key_resp.status == NOT_STARTED and t >= TRIPLET_START_TIME:
             # keep track of start time/frame for later
             key_resp.frameNStart = frameN  # exact frame index
@@ -452,22 +442,13 @@ for thisTrials_prac in trials_prac:
             key_resp.frameNStop = frameN  # exact frame index
             key_resp.status = FINISHED
         if key_resp.status == STARTED:
-            # read relevant buttons
-            theseKeys = event.getKeys()
-            response = readButtons()
-
-            if "escape" in theseKeys:
-                endExpNow = True
-            if response != 'none':
-                key_resp.rt = key_resp.clock.getTime() 
-                sendTrigger(button_out[int(response)-1])
-                logging.log(level=logging.EXP,\
-                            msg="Button box received: %s"&(response))
-                key_resp.keys = response
-
+            theseKeys = event.getKeys(keyList=['left', 'down', 'right'])
+            if len(theseKeys) > 0:
+                key_resp.keys = theseKeys[-1]  # just the last key pressed
+                key_resp.rt = key_resp.clock.getTime()
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True)
-                if key_dict[key_resp.keys] == val[counts == 1] or key_resp.keys == val[counts == 1]:
+                if key_dict[key_resp.keys] == val[counts == 1]:
                     key_resp.corr = 1
                     feedback.setText("Correct!")
                     feedback.setColor('white')
@@ -503,7 +484,7 @@ for thisTrials_prac in trials_prac:
     trials_prac.addData('triplets.started', triplets.tStart)
     trials_prac.addData('triplets.stopped', triplets.tStop)
     # check responses
-    if key_resp.keys in ['', [], None, 'none']:  # No response was made
+    if key_resp.keys in ['', [], None]:  # No response was made
         key_resp.keys = None
         key_resp.corr = 0;  # correct non-response
     # store data for trials_prac (TrialHandler)
@@ -529,6 +510,10 @@ for thisComponent in instr_taskComponents:
 t = 0
 instr_taskClock.reset()  # t0 is time of first possible flip
 frameN = -1
+
+#############################################################################
+############# LEGIT TASK INSTRUCTIONS ######################################
+############################################################################
 
 # -------Run Routine "instr_task"-------
 while continueRoutine:
@@ -575,6 +560,11 @@ while continueRoutine:
 print("Moving onto the actual task.")
 
 # -------Ending Routine "instr_task"-------
+
+#############################################################################
+############# ACTUAL TASK ##################################################
+############################################################################
+
 for thisComponent in instr_taskComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
@@ -593,7 +583,6 @@ if thisTrials_task != None:
     for paramName in thisTrials_task:
         exec('{} = thisTrials_task[paramName]'.format(paramName))
 
-type_counter = 0
 for thisTrials_task in trials_task:
     currentLoop = trials_task
     # abbreviate parameter names if possible (e.g. rgb = thisTrials_task.rgb)
@@ -657,14 +646,6 @@ for thisTrials_task in trials_task:
             # keep track of start time/frame for later
             triplets_2.frameNStart = frameN  # exact frame index
             triplets_2.tStart = t  # local t and not account for scr refresh
-            
-            # send trigger for trial type
-            if task_trials_type[type_counter]: # type 1 = control
-                win.callOnFlip(sendTrigger, triplet_congruent)
-            else:
-                win.callOnFlip(sendTrigger, triplet_incongruent)
-            type_counter += 1
-            
             triplets_2.setAutoDraw(True)
         if triplets_2.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
             # is it time to stop? (based on global clock, using actual start)
@@ -688,26 +669,16 @@ for thisTrials_task in trials_task:
             key_resp_4.frameNStop = frameN  # exact frame index
             key_resp_4.status = FINISHED
         if key_resp_4.status == STARTED:
-            # read relevant buttons
-            theseKeys = event.getKeys()
-            response = readButtons()
-
-            if "escape" in theseKeys:
-                endExpNow = True
-            if response != 'none':
-                key_resp_4.rt = key_resp_4.clock.getTime() 
-                sendTrigger(button_out[int(response)-1])
-                logging.log(level=logging.EXP,\
-                            msg="Button box received: %s"&(response))
-                key_resp_4.keys = response
-
-                # was this correct?
+            theseKeys = event.getKeys(keyList=['left', 'down', 'right'])
+            if len(theseKeys) > 0:
+                key_resp_4.keys = theseKeys[-1]  # just the last key pressed
+                key_resp_4.rt = key_resp.clock.getTime()
                 val, counts = np.unique(list(stim), return_counts=True)
-                if key_dict[key_resp_4.keys] == val[counts == 1] or key_resp_4.keys == val[counts == 1]:
+                if key_dict[key_resp_4.keys] == val[counts == 1]:
                     key_resp_4.corr = 1
                 else:
                     key_resp_4.corr = 0
-
+        
         # check for quit (typically the Esc key)
         if endExpNow or event.getKeys(keyList=["escape"]):
             core.quit()
