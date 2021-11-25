@@ -11,12 +11,13 @@ This Multi-Source Interference Task (MSIT) was built specifically for children a
     * Works by creating an array of 0s and 1s (congruent, incongruent), shuffling, sampling from stim categories, and storing in a list of dicts. 
 - [x] Add feedback during practice trials
     * For `list('122')`, find value with `count == 1` and look up correspondence with keyboard arrow button press
-- [ ] Liz to refine instructions text and other aesthetics (e.g., background colour, text size)
+- [x] Liz to refine instructions text and other aesthetics (e.g., background colour, text size)
 - [ ] Insert flashing square for photo diode
-- [ ] Set up parallel port I/O for registering button presses
-- [ ] Set up triggers to be sent to MEG acquisition system
-- [ ] Confirm lower left field visual grating stim parameters
-- [ ] Make version compatible with PsychoPy2
+- [x] Set up parallel port I/O for registering button presses
+- [x] Set up triggers to be sent to MEG acquisition system
+- [x] Confirm lower left field visual grating stim parameters
+    * Actually, will be a square grating that appears alongside text stimulus
+- [x] Make version compatible with PsychoPy2
 
 ## Task configuration
 
@@ -37,12 +38,12 @@ Fixation (0.5s) -> Triplet presentation + grating (3.0s) -> Blank screen (0.5s)
 | -------------- | ---- |
 | Number of congruent trials | 10 (practice)<br>100 |
 | Number of incongruent trials | 10 (practice)<br>100 |
-| Fixation cross and grating duration | 0.5 seconds |
-| Stimulus presentation duration | 3.0 seconds |
+| Fixation cross  duration | 0.5 seconds |
+| Triplet and grating duration | 3.0 seconds |
 | Blank screen duration | 0.5 seconds |
 | Congruent stim | 100, 020, 003 |
 | Incongruent stim | 221, 331 <br> 212, 313 <br> 112, 211 <br> 332, 233 <br> 311, 131 <br> 322, 232 |
-| Grating stim | Circular, phase 0.0, spatial frequency 3 |
+| Grating stim | Square, phase 0.0, spatial frequency 3 |
 
 Note that:
 * It's possible for the same two triplets to appear in a row (e.g., fixation -> '100' -> blank -> fixation -> '100')
