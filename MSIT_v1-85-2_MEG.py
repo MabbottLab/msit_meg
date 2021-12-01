@@ -88,32 +88,37 @@ VPIXX = 0   # set to 1 if testing in the MEG
 
 if VPIXX:
     # BUTTON BOX RESPONSES----------------------------------------------------#
-    BBOX_1_OR_2 = parallel.ParallelPort(0x3048)
-    BBOX_3 = parallel.ParallelPort(0x3048+2)
-    
-    # return button press and send signal to ACQ
+    BBOX = parallel.ParallelPort(0x3048) # instantiate data register
+    CTRL_PORT = parallel.ParallelPort(0x3048+2) # instantiate ctrl register
+    if not CTRL_PORT.readPin(7):  # flip control bit to set pport as input
+        CTRL_PORT.setPin(7,1)
+        
+    # return button press
     def readButtons():
-        if BBOX_1_OR_2.readPin(2):
-            return('1')
-        elif BBOX_1_OR_2.readPin(3):
-            return('2')
-        elif BBOX_3.readPin(2):
-            return('3')
+        if BBOX.readPin(2): # green/left/1
+            return(1)
+        elif BBOX.readPin(3): # yellow/up/2
+            return(2)
+        elif BBOX.readPin(4): # red/right/3
+            return(3)
         else:
-            return('none')
+            return(0)
 
     # SENDING OUT info about trials--------------------------------------------#
     MEG_ACQ         = parallel.ParallelPort(address=0x4048)
     triplet_congruent     = 1
     triplet_incongruent   = 2
-    button_out            = [4, 8, 16]
+    button_out            = [4, 8, 16] # [1, 2, 3] values, [G, Y, R] colours
 
     # send signal to ACQ
     def sendTrigger(triggerVal):
+        """ Sets data to be presented to the paralell port of 0xD030.  
+        Sets `triggerVal` pin to high, wait 0.01s, then set all ports to low.
+        """
         MEG_ACQ.setData(int(triggerVal))
         core.wait(0.01)
         MEG_ACQ.setData(0)
-
+    
 #------------TASK PARAMETERS--------------------------------------------------#
 FIX_START_TIME = 0.5
 FIX_DURATION = 0.5
@@ -149,8 +154,8 @@ task_trials = [{'stim': randchoice(all_control_stim)} if task_trials_type[x] == 
                for x in np.arange(TOTAL_TASK)]
 
 # set up dict of correct responses
-key_dict = {'left': '1', 'down': '2', 'right': '3', \
-            '1': 'left', '2': 'down', '3': 'right'}
+key_dict = {'left': '1', 'up': '2', 'right': '4', \
+            '1': 'left', '2': 'up', '4': 'right'}
 
 ################ INITIALIZING COMPONENTS FOR EXPERIMENT ################################
 
@@ -454,19 +459,17 @@ for thisTrials_prac in trials_prac:
         if key_resp.status == STARTED:
             # read relevant buttons
             theseKeys = event.getKeys()
-            response = readButtons()
+            response = readButtons() # will return 1, 2, 3, or 0
 
             if "escape" in theseKeys:
                 endExpNow = True
-            if response != 'none':
-                key_resp.rt = key_resp.clock.getTime() 
-                sendTrigger(button_out[int(response)-1])
-                logging.log(level=logging.EXP,\
-                            msg="Button box received: %s"&(response))
-                key_resp.keys = response
+            if response:
+                key_resp.rt = key_resp.clock.getTime() # log the reaction time
+                key_resp.keys = str(response) # log the response, convert to string
+                sendTrigger(button_out[response-1]) # log response in MEG ACQ
 
                 # was this correct?
-                val, counts = np.unique(list(stim), return_counts=True)
+                val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
                 if key_dict[key_resp.keys] == val[counts == 1] or key_resp.keys == val[counts == 1]:
                     key_resp.corr = 1
                     feedback.setText("Correct!")
@@ -694,12 +697,10 @@ for thisTrials_task in trials_task:
 
             if "escape" in theseKeys:
                 endExpNow = True
-            if response != 'none':
+            if response:
                 key_resp_4.rt = key_resp_4.clock.getTime() 
-                sendTrigger(button_out[int(response)-1])
-                logging.log(level=logging.EXP,\
-                            msg="Button box received: %s"&(response))
-                key_resp_4.keys = response
+                key_resp_4.keys = str(response)
+                sendTrigger(button_out[response-1])
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True)
