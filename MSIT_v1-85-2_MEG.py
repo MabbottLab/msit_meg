@@ -131,7 +131,7 @@ TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
 
 # setup instruction slides
 prac_instr = [{'imgidx': _thisDir + '\\images\\Slide' + str(x+1) + '.png'} \
-                for x in np.arange(14)]
+                for x in np.arange(15)]
 
 # Declare stimuli types
 all_control_stim=['100','020','003']
@@ -154,8 +154,8 @@ task_trials = [{'stim': randchoice(all_control_stim)} if task_trials_type[x] == 
                for x in np.arange(TOTAL_TASK)]
 
 # set up dict of correct responses
-key_dict = {'left': '1', 'up': '2', 'right': '4', \
-            '1': 'left', '2': 'up', '4': 'right'}
+key_dict = {'left': '1', 'up': '2', 'right': '3', \
+            '1': 'left', '2': 'up', '3': 'right'}
 
 ################ INITIALIZING COMPONENTS FOR EXPERIMENT ################################
 
@@ -206,7 +206,7 @@ key_resp = event.BuilderKeyResponse()
 # Initialize components for Routine "instr_task"
 instr_taskClock = core.Clock()
 task_instruct = visual.ImageStim(win=win, name='task_instruct',
-                image='images/Slide16.PNG', mask=None,
+                image='images/Slide17.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb',
                 flipHoriz=False, flipVert=False,
