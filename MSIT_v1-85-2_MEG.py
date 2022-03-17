@@ -109,6 +109,8 @@ if VPIXX:
     triplet_congruent     = 1
     triplet_incongruent   = 2
     button_out            = [4, 8, 16] # [1, 2, 3] values, [G, Y, R] colours
+    correct               = 32
+    incorrect             = 64
 
     # send signal to ACQ
     def sendTrigger(triggerVal):
@@ -477,7 +479,7 @@ for thisTrials_prac in trials_prac:
 
             if "escape" in theseKeys:
                 endExpNow = True
-            if response:
+            if response and not key_resp.keys: # only log first response
                 key_resp.rt = key_resp.clock.getTime() # log the reaction time
                 key_resp.keys = str(response) # log the response, convert to string
                 sendTrigger(button_out[response-1]) # log response in MEG ACQ
@@ -486,10 +488,12 @@ for thisTrials_prac in trials_prac:
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
                 if key_dict[key_resp.keys] == val[counts == 1] or key_resp.keys == val[counts == 1]:
                     key_resp.corr = 1
+                    sendTrigger(correct)
                     feedback.setText("Correct!")
                     feedback.setColor('white')
                 else:
                     key_resp.corr = 0
+                    sendTrigger(incorrect)
                     feedback.setText("Nice try.\nThe correct answer is %s."%(key_dict[val[counts == 1][0]]))
         
         # check for quit (typically the Esc key)
@@ -711,7 +715,7 @@ for thisTrials_task in trials_task:
 
             if "escape" in theseKeys:
                 endExpNow = True
-            if response:
+            if response and not key_resp_4.keys:
                 key_resp_4.rt = key_resp_4.clock.getTime() 
                 key_resp_4.keys = str(response)
                 sendTrigger(button_out[response-1])
@@ -720,8 +724,10 @@ for thisTrials_task in trials_task:
                 val, counts = np.unique(list(stim), return_counts=True)
                 if key_dict[key_resp_4.keys] == val[counts == 1] or key_resp_4.keys == val[counts == 1]:
                     key_resp_4.corr = 1
+                    sendTrigger(correct)
                 else:
                     key_resp_4.corr = 0
+                    sendTrigger(incorrect)
 
         # check for quit (typically the Esc key)
         if endExpNow or event.getKeys(keyList=["escape"]):
