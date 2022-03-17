@@ -195,6 +195,11 @@ triplets = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', 
     flipHoriz=False, flipVert=False,
     texRes=128.0, interpolate=True, depth=0.0)
+pixsignal = visual.Rect(
+    win=win,
+    name='trial_type', width=5, height=5, units='pix',
+    fillRGB=[255,255,255],
+    pos=[-960,540])
 feedback = visual.TextStim(win=win, ori=0, name='feedback',
     text='nonsense', font='Open Sans',
     alignHoriz='center', alignVert='top',
@@ -237,6 +242,11 @@ triplets_2 = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', 
     flipHoriz=False, flipVert=False,
     texRes=128.0, interpolate=True, depth=0.0)
+pixsignal_2 = visual.Rect(
+    win=win,
+    name='trial_type', width=5, height=5, units='pix',
+    fillRGB=[255,255,255],
+    pos=[-960,540])
 key_resp_4 = event.BuilderKeyResponse()
 
 # Initialize components for Routine "thx"
@@ -375,7 +385,7 @@ for thisTrials_prac in trials_prac:
     key_resp.rt = []
     _key_resp_allKeys = []
     # keep track of which components have finished
-    practiceComponents = [fix, grating, triplets, key_resp, feedback]
+    practiceComponents = [fix, grating, triplets, key_resp, pixsignal, feedback]
     for thisComponent in practiceComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -426,11 +436,14 @@ for thisTrials_prac in trials_prac:
             triplets.setAutoDraw(True)
             
             # send trigger for trial type
-            if prac_trials_type[type_counter]: # type 1 = control
-                win.callOnFlip(sendTrigger, triplet_congruent)
-            else:
-                win.callOnFlip(sendTrigger, triplet_incongruent)
+            #if prac_trials_type[type_counter]: # type 1 = control
+            #    win.callOnFlip(sendTrigger, triplet_congruent)
+            #else:
+            #    win.callOnFlip(sendTrigger, triplet_incongruent)
             type_counter += 1
+            
+            pixsignal.setColor([0, 64, 1])
+            pixsignal.setAutoDraw(True)
 
             feedback.setText('')
             feedback.setAutoDraw(True)
@@ -441,6 +454,7 @@ for thisTrials_prac in trials_prac:
             # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
             triplets.setAutoDraw(False)
             feedback.setAutoDraw(False)
+            pixsignal.setAutoDraw(False)
     
         # *key_resp* updates
         if key_resp.status == NOT_STARTED and t >= TRIPLET_START_TIME:
