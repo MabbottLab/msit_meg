@@ -132,7 +132,7 @@ TRIPLET_DURATION = 3.0 # set to lower value to debug
 ROUTINE_DURATION = 4.000 # set to 4.0000 usually
 
 TOTAL_PRACTICE = 20 # 10+10 congruent/incogruent trials
-TOTAL_TASK = 2 # 100+100 congruent/incongruent trials
+TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
 
 # setup instruction slides
 prac_instr = [{'imgidx': _thisDir + '\\images\\Slide' + str(x+1) + '.png'} \
@@ -444,6 +444,7 @@ for thisTrials_prac in trials_prac:
             if response and not key_resp.keys:
                 key_resp.rt = key_resp.clock.getTime()
                 key_resp.keys = str(response)
+                key_resp.status = FINISHED
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
@@ -670,6 +671,7 @@ for thisTrials_task in trials_task:
             if response and not key_resp.keys:
                 key_resp.rt = key_resp.clock.getTime()
                 key_resp.keys = str(response)
+                key_resp.status = FINISHED
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
