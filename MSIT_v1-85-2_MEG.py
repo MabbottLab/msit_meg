@@ -84,7 +84,7 @@ routineTimer = core.CountdownTimer()  # to track time remaining of each (non-sli
 ############# EVERYTHING HERE IS CUSTOM SETUP #################################
 
 # ---------- PARALLEL PORT SETUP ---------------------------------------------#
-VPIXX = 0   # set to 1 if testing in the MEG
+VPIXX = 1   # set to 1 if testing in the MEG
 
 if VPIXX:
     # BUTTON BOX RESPONSES----------------------------------------------------#
@@ -113,13 +113,13 @@ if VPIXX:
     # return button press
     def readButtons():
         if BBOX.readPin(2): # green/left/1
-            sendTrigger(button_out[1])
+            sendTrigger(button_out[0])
             return(1)
         elif BBOX.readPin(3): # yellow/up/2
-            sendTrigger(button_out[2])
+            sendTrigger(button_out[1])
             return(2)
         elif BBOX.readPin(4): # red/right/3
-            sendTrigger(button_out[3])
+            sendTrigger(button_out[2])
             return(3)
         else:
             return(0)
@@ -132,7 +132,7 @@ TRIPLET_DURATION = 3.0 # set to lower value to debug
 ROUTINE_DURATION = 4.000 # set to 4.0000 usually
 
 TOTAL_PRACTICE = 20 # 10+10 congruent/incogruent trials
-TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
+TOTAL_TASK = 2 # 100+100 congruent/incongruent trials
 
 # setup instruction slides
 prac_instr = [{'imgidx': _thisDir + '\\images\\Slide' + str(x+1) + '.png'} \
@@ -425,6 +425,7 @@ for thisTrials_prac in trials_prac:
             triplets.tStop = t  # not accounting for scr refresh
             triplets.frameNStop = frameN  # exact frame index
             # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
+            continueRoutine = False
             triplets.setAutoDraw(False)
             square.setAutoDraw(False)
             grating.setAutoDraw(False)
@@ -443,7 +444,6 @@ for thisTrials_prac in trials_prac:
             if response and not key_resp.keys:
                 key_resp.rt = key_resp.clock.getTime()
                 key_resp.keys = str(response)
-                continueRoutine = False
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
@@ -651,6 +651,7 @@ for thisTrials_task in trials_task:
             triplets.tStop = t  # not accounting for scr refresh
             triplets.frameNStop = frameN  # exact frame index
             # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
+            continueRoutine = False
             triplets.setAutoDraw(False)
             square.setAutoDraw(False)
             grating.setAutoDraw(False)
@@ -669,7 +670,6 @@ for thisTrials_task in trials_task:
             if response and not key_resp.keys:
                 key_resp.rt = key_resp.clock.getTime()
                 key_resp.keys = str(response)
-                continueRoutine = False
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
