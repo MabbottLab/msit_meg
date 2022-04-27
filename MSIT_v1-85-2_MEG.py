@@ -61,7 +61,7 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # Setup the Window
 win = visual.Window(
-    size=(1024, 768), fullscr=True, screen=0, 
+    size=(1920, 1080), fullscr=True, screen=0, 
     winType='pyglet', allowGUI=False, allowStencil=False,
     monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     # blendMode='avg', 
@@ -92,17 +92,6 @@ if VPIXX:
     CTRL_PORT = parallel.ParallelPort(0x3048+2) # instantiate ctrl register
     if not CTRL_PORT.readPin(7):  # flip control bit to set pport as input
         CTRL_PORT.setPin(7,1)
-        
-    # return button press
-    def readButtons():
-        if BBOX.readPin(2): # green/left/1
-            return(1)
-        elif BBOX.readPin(3): # yellow/up/2
-            return(2)
-        elif BBOX.readPin(4): # red/right/3
-            return(3)
-        else:
-            return(0)
 
     # SENDING OUT info about trials--------------------------------------------#
     MEG_ACQ         = parallel.ParallelPort(address=0x4048)
@@ -120,6 +109,20 @@ if VPIXX:
         MEG_ACQ.setData(int(triggerVal))
         core.wait(0.01)
         MEG_ACQ.setData(0)
+    
+    # return button press
+    def readButtons():
+        if BBOX.readPin(2): # green/left/1
+            sendTrigger(button_out[1])
+            return(1)
+        elif BBOX.readPin(3): # yellow/up/2
+            sendTrigger(button_out[2])
+            return(2)
+        elif BBOX.readPin(4): # red/right/3
+            sendTrigger(button_out[3])
+            return(3)
+        else:
+            return(0)
     
 #------------TASK PARAMETERS--------------------------------------------------#
 FIX_START_TIME = 0.5
@@ -171,20 +174,22 @@ instr_slide = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', 
     flipHoriz=False, flipVert=False,
     texRes=128.0, interpolate=True, depth=0.0)
-key_resp_2 = event.BuilderKeyResponse()
+key_resp = event.BuilderKeyResponse()
 
 # Initialize components for Routine "practice"
 practiceClock = core.Clock()
-fix = visual.TextStim(win=win, name='fix',
-    text='+',
-    font='Open Sans',
-    pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0, 
-    color='white', colorSpace='rgb',  
-    # languageStyle='LTR',
-    depth=0.0);
+taskClock = core.Clock()
+fix = visual.ImageStim(
+    win=win,
+    name='fix', 
+    image='images/fix_white.PNG', mask=None,
+    ori=0.0, pos=(0, 0), size=None,
+    color=[1,1,1], colorSpace='rgb', 
+    flipHoriz=False, flipVert=False,
+    texRes=128.0, interpolate=True, depth=0.0)
 grating = visual.GratingStim(
     win=win, name='grating',units='height', 
-    tex='sin', 
+    tex='sin',
     ori=0.0, pos=(-0.7,-0.3), size=[0.2], sf=3.0, phase=0.0,
     color=[1,1,1], colorSpace='rgb',
     contrast=1.0, # blendmode='avg',
@@ -197,18 +202,20 @@ triplets = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', 
     flipHoriz=False, flipVert=False,
     texRes=128.0, interpolate=True, depth=0.0)
-pixsignal = visual.Rect(
-    win=win,
-    name='trial_type', width=5, height=5, units='pix',
-    fillRGB=[255,255,255],
-    pos=[-960,540])
 feedback = visual.TextStim(win=win, ori=0, name='feedback',
     text='nonsense', font='Open Sans',
     alignHoriz='center', alignVert='top',
     pos=(0, 0.3), height=0.05, wrapWidth=None,
     color='white', colorSpace='rgb', 
     depth=0.0)
-key_resp = event.BuilderKeyResponse()
+square = visual.Rect(
+    win=win, name='square', units='height', 
+    width = 0.1, height = 0.1, 
+    fillColor=[1,1,1], pos=(-0.84, 0))    
+square_black = visual.Rect(
+    win=win, name='square', units='height', 
+    width = 0.1, height = 0.1, 
+    fillColor=[-1,-1,-1], lineColor=[-1,-1,-1], pos=(-0.84, 0))
 
 # Initialize components for Routine "instr_task"
 instr_taskClock = core.Clock()
@@ -218,43 +225,11 @@ task_instruct = visual.ImageStim(win=win, name='task_instruct',
                 color=[1,1,1], colorSpace='rgb',
                 flipHoriz=False, flipVert=False,
                 texRes=128.0, interpolate=True, depth=0.0)
-key_resp_3 = event.BuilderKeyResponse()
-
-# Initialize components for Routine "task"
-taskClock = core.Clock()
-fix_2 = visual.TextStim(win=win, name='fix',
-    text='+',
-    font='Open Sans',
-    pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0, 
-    color='white', colorSpace='rgb',  
-    # languageStyle='LTR',
-    depth=0.0);
-grating_2 = visual.GratingStim(
-    win=win, name='grating',units='height', 
-    tex='sin', 
-    ori=0.0, pos=(-0.7,-0.3), size=[0.2], sf=3.0, phase=0.0,
-    color=[1,1,1], colorSpace='rgb',
-    contrast=1.0, # blendmode='avg',
-    texRes=128.0, interpolate=True, depth=-1.0)
-triplets_2 = visual.ImageStim(
-    win=win,
-    name='triplets_2', 
-    image='images/100.PNG', mask=None,
-    ori=0.0, pos=(0, 0), size=None,
-    color=[1,1,1], colorSpace='rgb', 
-    flipHoriz=False, flipVert=False,
-    texRes=128.0, interpolate=True, depth=0.0)
-pixsignal_2 = visual.Rect(
-    win=win,
-    name='trial_type', width=5, height=5, units='pix',
-    fillRGB=[255,255,255],
-    pos=[-960,540])
-key_resp_4 = event.BuilderKeyResponse()
 
 # Initialize components for Routine "thx"
 thxClock = core.Clock()
 thanks = visual.ImageStim(win=win, name='thanks',
-                image='images/Slide17.PNG', mask=None,
+                image='images/Slide18.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb', 
                 flipHoriz=False, flipVert=False,
@@ -387,7 +362,7 @@ for thisTrials_prac in trials_prac:
     key_resp.rt = []
     _key_resp_allKeys = []
     # keep track of which components have finished
-    practiceComponents = [fix, grating, triplets, key_resp, pixsignal, feedback]
+    practiceComponents = [fix, grating, triplets, key_resp, square, square_black, feedback]
     for thisComponent in practiceComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -412,23 +387,13 @@ for thisTrials_prac in trials_prac:
             fix.frameNStart = frameN  # exact frame index
             fix.tStart = t  # local t and not account for scr refresh
             fix.setAutoDraw(True)
+            square_black.setAutoDraw(True)
         if fix.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
             # keep track of stop time/frame for later
             fix.tStop = t  # not accounting for scr refresh
             fix.frameNStop = frameN  # exact frame index
             fix.setAutoDraw(False)
-    
-        # *grating* updates
-        if grating.status == NOT_STARTED and t >= TRIPLET_START_TIME:
-            # keep track of start time/frame for later
-            grating.frameNStart = frameN  # exact frame index
-            grating.tStart = t  # local t and not account for scr refresh
-            grating.setAutoDraw(True)
-        if grating.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
-            # keep track of stop time/frame for later
-            grating.tStop = t  # not accounting for scr refresh
-            grating.frameNStop = frameN  # exact frame index
-            grating.setAutoDraw(False)
+            square_black.setAutoDraw(False)
     
         # *triplets* updates
         if triplets.status == NOT_STARTED and t >= TRIPLET_START_TIME:
@@ -436,30 +401,11 @@ for thisTrials_prac in trials_prac:
             triplets.frameNStart = frameN  # exact frame index
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
-            
-            # send trigger for trial type
-            #if prac_trials_type[type_counter]: # type 1 = control
-            #    win.callOnFlip(sendTrigger, triplet_congruent)
-            #else:
-            #    win.callOnFlip(sendTrigger, triplet_incongruent)
-            type_counter += 1
-            
-            pixsignal.setColor([0, 64, 1])
-            pixsignal.setAutoDraw(True)
-
+            square.setAutoDraw(True)
+            grating.setAutoDraw(True)
             feedback.setText('')
             feedback.setAutoDraw(True)
-        elif triplets.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
-            # keep track of stop time/frame for later
-            triplets.tStop = t  # not accounting for scr refresh
-            triplets.frameNStop = frameN  # exact frame index
-            # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
-            triplets.setAutoDraw(False)
-            feedback.setAutoDraw(False)
-            pixsignal.setAutoDraw(False)
-    
-        # *key_resp* updates
-        if key_resp.status == NOT_STARTED and t >= TRIPLET_START_TIME:
+            
             # keep track of start time/frame for later
             key_resp.frameNStart = frameN  # exact frame index
             key_resp.tStart = t  # local t and not account for scr refresh
@@ -467,22 +413,37 @@ for thisTrials_prac in trials_prac:
             # keyboard checking is just starting
             win.callOnFlip(key_resp.clock.reset)  # t=0 on next screen flip
             event.clearEvents(eventType='keyboard')  # clear events on next screen flip
-        if key_resp.status == STARTED and t >= TRIPLET_START_TIME + 3.0: 
+            
+            # send trigger for trial type
+            if prac_trials_type[type_counter]: # type 1 = control
+                win.callOnFlip(sendTrigger, triplet_congruent)
+            else:
+                win.callOnFlip(sendTrigger, triplet_incongruent)
+            type_counter += 1
+        elif triplets.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
+            # keep track of stop time/frame for later
+            triplets.tStop = t  # not accounting for scr refresh
+            triplets.frameNStop = frameN  # exact frame index
+            # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
+            triplets.setAutoDraw(False)
+            square.setAutoDraw(False)
+            grating.setAutoDraw(False)
+            feedback.setAutoDraw(False)
+    
+        # *key_resp* updates
+        waitOnFlip = False
+        if key_resp.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION: 
             # keep track of stop time/frame for later
             key_resp.tStop = t  # not accounting for scr refresh
             key_resp.frameNStop = frameN  # exact frame index
             key_resp.status = FINISHED
         if key_resp.status == STARTED:
             # read relevant buttons
-            theseKeys = event.getKeys()
-            response = readButtons() # will return 1, 2, 3, or 0
-
-            if "escape" in theseKeys:
-                endExpNow = True
-            if response and not key_resp.keys: # only log first response
-                key_resp.rt = key_resp.clock.getTime() # log the reaction time
-                key_resp.keys = str(response) # log the response, convert to string
-                sendTrigger(button_out[response-1]) # log response in MEG ACQ
+            response = readButtons() # will return 1, 2, 3, or 0 and send trigger
+            if response and not key_resp.keys:
+                key_resp.rt = key_resp.clock.getTime()
+                key_resp.keys = str(response)
+                continueRoutine = False
 
                 # was this correct?
                 val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
@@ -519,8 +480,6 @@ for thisTrials_prac in trials_prac:
             thisComponent.setAutoDraw(False)
     trials_prac.addData('fix.started', fix.tStart)
     trials_prac.addData('fix.stopped', fix.tStop)
-    trials_prac.addData('grating.started', grating.tStart)
-    trials_prac.addData('grating.stopped', grating.tStop)
     trials_prac.addData('triplets.started', triplets.tStart)
     trials_prac.addData('triplets.stopped', triplets.tStop)
     # check responses
@@ -539,10 +498,10 @@ for thisTrials_prac in trials_prac:
 # ------Prepare to start Routine "instr_task"-------
 continueRoutine = True
 # update component parameters for each repeat
-key_resp_3.keys = []
-key_resp_3.rt = []
+key_resp.keys = []
+key_resp.rt = []
 # keep track of which components have finished
-instr_taskComponents = [task_instruct, key_resp_3]
+instr_taskComponents = [task_instruct, key_resp]
 for thisComponent in instr_taskComponents:
     if hasattr(thisComponent, 'status'):
         thisComponent.status = NOT_STARTED
@@ -564,13 +523,13 @@ while continueRoutine:
     
     # *key_resp_3* updates
     waitOnFlip = False
-    if key_resp_3.status == NOT_STARTED and t >= 0.0-frameTolerance:
-        key_resp_3.status = STARTED
+    if key_resp.status == NOT_STARTED and t >= 0.0-frameTolerance:
+        key_resp.status = STARTED
         # keyboard checking is just starting
         waitOnFlip = True
-        win.callOnFlip(key_resp_3.clock.reset)  # t=0 on next screen flip
+        win.callOnFlip(key_resp.clock.reset)  # t=0 on next screen flip
         event.clearEvents(eventType='keyboard')  # clear events on next screen flip
-    if key_resp_3.status == STARTED and not waitOnFlip:
+    if key_resp.status == STARTED and not waitOnFlip:
         theseKeys = event.getKeys(keyList=['space'])
         if len(theseKeys) > 0:
             # a response ends the routine
@@ -626,11 +585,11 @@ for thisTrials_task in trials_task:
     continueRoutine = True
     routineTimer.add(ROUTINE_DURATION)
     # update component parameters for each repeat
-    triplets_2.setImage(_thisDir + '\\images\\' + str(stim) + '.png')
-    key_resp_4.keys = []
-    key_resp_4.rt = []
+    triplets.setImage(_thisDir + '\\images\\' + str(stim) + '.png')
+    key_resp.keys = []
+    key_resp.rt = []
     # keep track of which components have finished
-    taskComponents = [fix_2, grating_2, triplets_2, key_resp_4]
+    taskComponents = [fix, grating, triplets, square, square_black, key_resp]
     for thisComponent in taskComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -648,36 +607,38 @@ for thisTrials_task in trials_task:
         frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
         # update/draw components on each frame
         
-        # *fix_2* updates
-        if fix_2.status == NOT_STARTED and t >= FIX_START_TIME:
+        # *fix* updates
+        if fix.status == NOT_STARTED and t >= FIX_START_TIME:
             # keep track of start time/frame for later
-            fix_2.frameNStart = frameN  # exact frame index
-            fix_2.tStart = t  # local t and not account for scr refresh
-            fix_2.setAutoDraw(True)
-        if fix_2.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
+            fix.frameNStart = frameN  # exact frame index
+            fix.tStart = t  # local t and not account for scr refresh
+            fix.setAutoDraw(True)
+            square_black.setAutoDraw(True)
+        if fix.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
             # keep track of stop time/frame for later
-            fix_2.tStop = t  # not accounting for scr refresh
-            fix_2.frameNStop = frameN  # exact frame index
-            fix_2.setAutoDraw(False)
+            fix.tStop = t  # not accounting for scr refresh
+            fix.frameNStop = frameN  # exact frame index
+            fix.setAutoDraw(False)
+            square_black.setAutoDraw(False)
     
-        # *grating_2* updates
-        if grating_2.status == NOT_STARTED and t >= TRIPLET_START_TIME:
+        # *triplets* updates
+        if triplets.status == NOT_STARTED and t >= TRIPLET_START_TIME:
             # keep track of start time/frame for later
-            grating_2.frameNStart = frameN  # exact frame index
-            grating_2.tStart = t  # local t and not account for scr refresh
-            grating_2.setAutoDraw(True)
-        if grating_2.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
-            # is it time to stop? (based on global clock, using actual start)
-            # keep track of stop time/frame for later
-            grating_2.tStop = t  # not accounting for scr refresh
-            grating_2.frameNStop = frameN  # exact frame index
-            grating_2.setAutoDraw(False)
-    
-        # *triplets_2* updates
-        if triplets_2.status == NOT_STARTED and t >= TRIPLET_START_TIME:
+            triplets.frameNStart = frameN  # exact frame index
+            triplets.tStart = t  # local t and not account for scr refresh
+            triplets.setAutoDraw(True)
+            square.setAutoDraw(True)
+            grating.setAutoDraw(True)
+            feedback.setText('')
+            feedback.setAutoDraw(True)
+            
             # keep track of start time/frame for later
-            triplets_2.frameNStart = frameN  # exact frame index
-            triplets_2.tStart = t  # local t and not account for scr refresh
+            key_resp.frameNStart = frameN  # exact frame index
+            key_resp.tStart = t  # local t and not account for scr refresh
+            key_resp.status = STARTED
+            # keyboard checking is just starting
+            win.callOnFlip(key_resp.clock.reset)  # t=0 on next screen flip
+            event.clearEvents(eventType='keyboard')  # clear events on next screen flip
             
             # send trigger for trial type
             if task_trials_type[type_counter]: # type 1 = control
@@ -685,49 +646,43 @@ for thisTrials_task in trials_task:
             else:
                 win.callOnFlip(sendTrigger, triplet_incongruent)
             type_counter += 1
+        elif triplets.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
+            # keep track of stop time/frame for later
+            triplets.tStop = t  # not accounting for scr refresh
+            triplets.frameNStop = frameN  # exact frame index
+            # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
+            triplets.setAutoDraw(False)
+            square.setAutoDraw(False)
+            grating.setAutoDraw(False)
+            feedback.setAutoDraw(False)
             
-            triplets_2.setAutoDraw(True)
-        if triplets_2.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
-            # is it time to stop? (based on global clock, using actual start)
+        waitOnFlip = False
+        # *key_resp* updates
+        if key_resp.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION: 
             # keep track of stop time/frame for later
-            triplets_2.tStop = t  # not accounting for scr refresh
-            triplets_2.frameNStop = frameN  # exact frame index
-            triplets_2.setAutoDraw(False)
-    
-        # *key_resp_4* updates
-        if key_resp_4.status == NOT_STARTED and t >= TRIPLET_START_TIME:
-            # keep track of start time/frame for later
-            key_resp_4.frameNStart = frameN  # exact frame index
-            key_resp_4.tStart = t  # local t and not account for scr refresh
-            key_resp_4.status = STARTED
-            # keyboard checking is just starting
-            win.callOnFlip(key_resp_4.clock.reset)  # t=0 on next screen flip
-            event.clearEvents(eventType='keyboard')  # clear events on next screen flip
-        if key_resp_4.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
-            # keep track of stop time/frame for later
-            key_resp_4.tStop = t  # not accounting for scr refresh
-            key_resp_4.frameNStop = frameN  # exact frame index
-            key_resp_4.status = FINISHED
-        if key_resp_4.status == STARTED:
+            key_resp.tStop = t  # not accounting for scr refresh
+            key_resp.frameNStop = frameN  # exact frame index
+            key_resp.status = FINISHED
+        if key_resp.status == STARTED:
             # read relevant buttons
-            theseKeys = event.getKeys()
-            response = readButtons()
-
-            if "escape" in theseKeys:
-                endExpNow = True
-            if response and not key_resp_4.keys:
-                key_resp_4.rt = key_resp_4.clock.getTime() 
-                key_resp_4.keys = str(response)
-                sendTrigger(button_out[response-1])
+            response = readButtons() # will return 1, 2, 3, or 0 and send trigger
+            if response and not key_resp.keys:
+                key_resp.rt = key_resp.clock.getTime()
+                key_resp.keys = str(response)
+                continueRoutine = False
 
                 # was this correct?
-                val, counts = np.unique(list(stim), return_counts=True)
-                if key_dict[key_resp_4.keys] == val[counts == 1] or key_resp_4.keys == val[counts == 1]:
-                    key_resp_4.corr = 1
+                val, counts = np.unique(list(stim), return_counts=True) # right answer = number with 1 occurrence
+                if key_dict[key_resp.keys] == val[counts == 1] or key_resp.keys == val[counts == 1]:
+                    key_resp.corr = 1
                     sendTrigger(correct)
+                    feedback.setText("Correct!")
+                    feedback.setColor('white')
                 else:
-                    key_resp_4.corr = 0
+                    key_resp.corr = 0
                     sendTrigger(incorrect)
+                    feedback.setText("Nice try.\nThe correct answer is %s."%(key_dict[val[counts == 1][0]]))
+        
 
         # check for quit (typically the Esc key)
         if endExpNow or event.getKeys(keyList=["escape"]):
@@ -750,23 +705,23 @@ for thisTrials_task in trials_task:
     for thisComponent in taskComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    trials_task.addData('fix_2.started', fix_2.tStart)
-    trials_task.addData('fix_2.stopped', fix_2.tStop)
-    trials_task.addData('grating_2.started', grating_2.tStart)
-    trials_task.addData('grating_2.stopped', grating_2.tStop)
-    trials_task.addData('triplets_2.started', triplets_2.tStart)
-    trials_task.addData('triplets_2.stopped', triplets_2.tStop)
+    trials_task.addData('fix.started', fix.tStart)
+    trials_task.addData('fix.stopped', fix.tStop)
+    trials_task.addData('grating.started', grating.tStart)
+    trials_task.addData('grating.stopped', grating.tStop)
+    trials_task.addData('triplets.started', triplets.tStart)
+    trials_task.addData('triplets.stopped', triplets.tStop)
     # check responses
-    if key_resp_4.keys in ['', [], None]:  # No response was made
-        key_resp_4.keys = None
-        key_resp_4.corr = 0;  # failed to respond (incorrectly)
+    if key_resp.keys in ['', [], None]:  # No response was made
+        key_resp.keys = None
+        key_resp.corr = 0;  # failed to respond (incorrectly)
     # store data for trials_task (TrialHandler)
-    trials_task.addData('key_resp_4.keys',key_resp_4.keys)
-    trials_task.addData('key_resp_4.corr', key_resp_4.corr)
-    if key_resp_4.keys != None:  # we had a response
-        trials_task.addData('key_resp_4.rt', key_resp_4.rt)
-    trials_task.addData('key_resp_4.started', key_resp_4.tStart)
-    trials_task.addData('key_resp_4.stopped', key_resp_4.tStop)
+    trials_task.addData('key_resp.keys',key_resp.keys)
+    trials_task.addData('key_resp.corr', key_resp.corr)
+    if key_resp.keys != None:  # we had a response
+        trials_task.addData('key_resp.rt', key_resp.rt)
+    trials_task.addData('key_resp.started', key_resp.tStart)
+    trials_task.addData('key_resp.stopped', key_resp.tStop)
     thisExp.nextEntry()
 
 # ------Prepare to start Routine "thx"-------
