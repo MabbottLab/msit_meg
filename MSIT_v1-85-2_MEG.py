@@ -216,6 +216,10 @@ square_black = visual.Rect(
     win=win, name='square', units='height', 
     width = 0.1, height = 0.1, 
     fillColor=[-1,-1,-1], lineColor=[-1,-1,-1], pos=(-0.84, 0))
+pixel_mode = visual.Rect(
+    win=win, name='pixmode', units='pix', 
+    width = 3, height = 3, 
+    fillColor = [128, 0, 0], lineColor = [128, 0, 0], pos=(-960, 540))
 
 # Initialize components for Routine "instr_task"
 instr_taskClock = core.Clock()
@@ -362,7 +366,7 @@ for thisTrials_prac in trials_prac:
     key_resp.rt = []
     _key_resp_allKeys = []
     # keep track of which components have finished
-    practiceComponents = [fix, grating, triplets, key_resp, square, square_black, feedback]
+    practiceComponents = [fix, grating, triplets, key_resp, square, square_black, pixel_mode, feedback]
     for thisComponent in practiceComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -402,6 +406,7 @@ for thisTrials_prac in trials_prac:
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
             square.setAutoDraw(True)
+            pixel_mode.setAutoDraw(True)
             grating.setAutoDraw(True)
             feedback.setText('')
             feedback.setAutoDraw(True)
@@ -428,6 +433,7 @@ for thisTrials_prac in trials_prac:
             continueRoutine = False
             triplets.setAutoDraw(False)
             square.setAutoDraw(False)
+            pixel_mode.setAutoDraw(False)
             grating.setAutoDraw(False)
             feedback.setAutoDraw(False)
     
@@ -590,7 +596,7 @@ for thisTrials_task in trials_task:
     key_resp.keys = []
     key_resp.rt = []
     # keep track of which components have finished
-    taskComponents = [fix, grating, triplets, square, square_black, key_resp]
+    taskComponents = [fix, grating, triplets, square, square_black, pixel_mode, key_resp]
     for thisComponent in taskComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -629,6 +635,7 @@ for thisTrials_task in trials_task:
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
             square.setAutoDraw(True)
+            pixel_mode.setAutoDraw(True)
             grating.setAutoDraw(True)
             feedback.setText('')
             feedback.setAutoDraw(True)
@@ -655,6 +662,7 @@ for thisTrials_task in trials_task:
             continueRoutine = False
             triplets.setAutoDraw(False)
             square.setAutoDraw(False)
+            pixel_mode.setAUtoDraw(False)
             grating.setAutoDraw(False)
             feedback.setAutoDraw(False)
             
