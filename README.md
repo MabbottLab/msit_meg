@@ -12,7 +12,7 @@ This Multi-Source Interference Task (MSIT) was built specifically for children a
 - [x] Add feedback during practice trials
     * For `list('122')`, find value with `count == 1` and look up correspondence with keyboard arrow button press
 - [x] Liz to refine instructions text and other aesthetics (e.g., background colour, text size)
-- [ ] Insert flashing square for photo diode
+- [ ] ~Insert flashing square for photo diode~
 - [x] Set up parallel port I/O for registering button presses
 - [x] Set up triggers to be sent to MEG acquisition system
 - [x] Confirm lower left field visual grating stim parameters
@@ -23,21 +23,31 @@ This Multi-Source Interference Task (MSIT) was built specifically for children a
 
 ### Breakdown:
 ```
-Instructions -> Practice: 20 trials (randomized) -> Checkpoint -> Task: 200 trials (randomized)
-             ->      4s x 20 trials = 1.33min     ->            -> 4s x 200 trials = 13.3min
+Instructions -> Practice: 15 trials (randomized) -> Checkpoint -> Task: 200 trials (randomized)
+             ->      6s x 15 trials = 1.5min     ->            -> 4s x 200 trials = 13.3min
 ```
 
 ### Trial breakdown:
 ```
-Fixation (0.5s) -> Triplet presentation + grating (3.0s) -> Blank screen (0.5s)
+Practice (6 sec): Fixation (0.5s) -> Triplet presentation + grating (5.0s) -> Blank screen (0.5s)
+Actual (4 sec): Fixation (0.5s) -> Triplet presentation + grating (3.0s) -> Blank screen (0.5s)
 ```
+
+### Relevant markers in MEG file:
+* PixMode (Triplet presentation)
+* Congruent/incongruent
+* Button_1, Button_2, Button_3
+* Correct (lack of correct = incorrect)
+
+Note that, because PsychoPy does fancy stuff with locking stimulus presentation to frame changes, pixel mode triggers line up perfectly to the "next frame" after a digital trigger is sent. 
 
 ### Additional info:
 
 | Task component | Info |
 | -------------- | ---- |
-| Number of congruent trials | 10 (practice)<br>100 |
-| Number of incongruent trials | 10 (practice)<br>100 |
+| Number of practice trials | 15 |
+| Number of congruent trials | 100 |
+| Number of incongruent trials | 100 |
 | Fixation cross  duration | 0.5 seconds |
 | Triplet and grating duration | 3.0 seconds |
 | Blank screen duration | 0.5 seconds |
