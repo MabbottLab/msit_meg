@@ -61,7 +61,7 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # Setup the Window
 win = visual.Window(
-    size=(1920, 1080), fullscr=True, screen=0, 
+    size=(1920, 1080), fullscr=True, screen=1, 
     winType='pyglet', allowGUI=False, allowStencil=False,
     monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     # blendMode='avg', 
@@ -131,12 +131,12 @@ TRIPLET_START_TIME = 1.0
 TRIPLET_DURATION = 3.0 # set to lower value to debug
 ROUTINE_DURATION = 4.000 # set to 4.0000 usually
 
-TOTAL_PRACTICE = 20 # 10+10 congruent/incogruent trials
+TOTAL_PRACTICE = 15 # 10+10 congruent/incogruent trials
 TOTAL_TASK = 200 # 100+100 congruent/incongruent trials
 
 # setup instruction slides
 prac_instr = [{'imgidx': _thisDir + '\\images\\Slide' + str(x+1) + '.png'} \
-                for x in np.arange(15)]
+                for x in np.arange(12)]
 
 # Declare stimuli types
 all_control_stim=['100','020','003']
@@ -208,23 +208,15 @@ feedback = visual.TextStim(win=win, ori=0, name='feedback',
     pos=(0, 0.3), height=0.05, wrapWidth=None,
     color='white', colorSpace='rgb', 
     depth=0.0)
-square = visual.Rect(
-    win=win, name='square', units='height', 
-    width = 0.1, height = 0.1, 
-    fillColor=[1,1,1], pos=(-0.84, 0))    
-square_black = visual.Rect(
-    win=win, name='square', units='height', 
-    width = 0.1, height = 0.1, 
-    fillColor=[-1,-1,-1], lineColor=[-1,-1,-1], pos=(-0.84, 0))
 pixel_mode = visual.Rect(
     win=win, name='pixmode', units='pix', 
-    width = 3, height = 3, 
-    fillColor = [128, 0, 0], lineColor = [128, 0, 0], pos=(-960, 540))
+    width = 5, height = 5, 
+    fillColor = [128, 0, 0], lineColor = [128, 0, 0], pos=(-961, 541))
 
 # Initialize components for Routine "instr_task"
 instr_taskClock = core.Clock()
 task_instruct = visual.ImageStim(win=win, name='task_instruct',
-                image='images/Slide17.PNG', mask=None,
+                image='images/Slide14.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb',
                 flipHoriz=False, flipVert=False,
@@ -233,11 +225,20 @@ task_instruct = visual.ImageStim(win=win, name='task_instruct',
 # Initialize components for Routine "thx"
 thxClock = core.Clock()
 thanks = visual.ImageStim(win=win, name='thanks',
-                image='images/Slide18.PNG', mask=None,
+                image='images/Slide16.PNG', mask=None,
                 ori=0.0, pos=(0, 0), size=None,
                 color=[1,1,1], colorSpace='rgb', 
                 flipHoriz=False, flipVert=False,
                 texRes=128.0, interpolate=True, depth=0.0)
+
+
+### REST ###
+
+event.clearEvents(eventType='keyboard')  
+while event.getKeys() == []:
+    fix.draw()
+    win.flip()
+
 
 ################################################################################
 ########## PRACTICE INSTRUCTIONS #####################################################
@@ -358,7 +359,7 @@ for thisTrials_prac in trials_prac:
     
     # ------Prepare to start Routine "practice"-------
     continueRoutine = True
-    routineTimer.add(ROUTINE_DURATION)
+    routineTimer.add(6.0)
     # update component parameters for each repeat
     triplets.setImage(_thisDir + '\\images\\' + str(stim) + '.png')
 
@@ -366,7 +367,7 @@ for thisTrials_prac in trials_prac:
     key_resp.rt = []
     _key_resp_allKeys = []
     # keep track of which components have finished
-    practiceComponents = [fix, grating, triplets, key_resp, square, square_black, pixel_mode, feedback]
+    practiceComponents = [fix, grating, triplets, key_resp, pixel_mode, feedback]
     for thisComponent in practiceComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -391,13 +392,11 @@ for thisTrials_prac in trials_prac:
             fix.frameNStart = frameN  # exact frame index
             fix.tStart = t  # local t and not account for scr refresh
             fix.setAutoDraw(True)
-            square_black.setAutoDraw(True)
         if fix.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
             # keep track of stop time/frame for later
             fix.tStop = t  # not accounting for scr refresh
             fix.frameNStop = frameN  # exact frame index
             fix.setAutoDraw(False)
-            square_black.setAutoDraw(False)
     
         # *triplets* updates
         if triplets.status == NOT_STARTED and t >= TRIPLET_START_TIME:
@@ -405,7 +404,6 @@ for thisTrials_prac in trials_prac:
             triplets.frameNStart = frameN  # exact frame index
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
-            square.setAutoDraw(True)
             pixel_mode.setAutoDraw(True)
             grating.setAutoDraw(True)
             feedback.setText('')
@@ -425,21 +423,20 @@ for thisTrials_prac in trials_prac:
             else:
                 win.callOnFlip(sendTrigger, triplet_incongruent)
             type_counter += 1
-        elif triplets.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION:
+        elif triplets.status == STARTED and t >= TRIPLET_START_TIME + 5.0:
             # keep track of stop time/frame for later
             triplets.tStop = t  # not accounting for scr refresh
             triplets.frameNStop = frameN  # exact frame index
             # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
             continueRoutine = False
             triplets.setAutoDraw(False)
-            square.setAutoDraw(False)
             pixel_mode.setAutoDraw(False)
             grating.setAutoDraw(False)
             feedback.setAutoDraw(False)
     
         # *key_resp* updates
         waitOnFlip = False
-        if key_resp.status == STARTED and t >= TRIPLET_START_TIME + TRIPLET_DURATION: 
+        if key_resp.status == STARTED and t >= TRIPLET_START_TIME + 5.0: 
             # keep track of stop time/frame for later
             key_resp.tStop = t  # not accounting for scr refresh
             key_resp.frameNStop = frameN  # exact frame index
@@ -596,7 +593,7 @@ for thisTrials_task in trials_task:
     key_resp.keys = []
     key_resp.rt = []
     # keep track of which components have finished
-    taskComponents = [fix, grating, triplets, square, square_black, pixel_mode, key_resp]
+    taskComponents = [fix, grating, triplets, pixel_mode, key_resp]
     for thisComponent in taskComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -620,13 +617,11 @@ for thisTrials_task in trials_task:
             fix.frameNStart = frameN  # exact frame index
             fix.tStart = t  # local t and not account for scr refresh
             fix.setAutoDraw(True)
-            square_black.setAutoDraw(True)
         if fix.status == STARTED and t >= FIX_START_TIME + FIX_DURATION:
             # keep track of stop time/frame for later
             fix.tStop = t  # not accounting for scr refresh
             fix.frameNStop = frameN  # exact frame index
             fix.setAutoDraw(False)
-            square_black.setAutoDraw(False)
     
         # *triplets* updates
         if triplets.status == NOT_STARTED and t >= TRIPLET_START_TIME:
@@ -634,11 +629,8 @@ for thisTrials_task in trials_task:
             triplets.frameNStart = frameN  # exact frame index
             triplets.tStart = t  # local t and not account for scr refresh
             triplets.setAutoDraw(True)
-            square.setAutoDraw(True)
             pixel_mode.setAutoDraw(True)
             grating.setAutoDraw(True)
-            feedback.setText('')
-            feedback.setAutoDraw(True)
             
             # keep track of start time/frame for later
             key_resp.frameNStart = frameN  # exact frame index
@@ -661,10 +653,9 @@ for thisTrials_task in trials_task:
             # win.timeOnFlip(triplets, 'tStopRefresh')  # time at next scr refresh
             continueRoutine = False
             triplets.setAutoDraw(False)
-            square.setAutoDraw(False)
             pixel_mode.setAUtoDraw(False)
             grating.setAutoDraw(False)
-            feedback.setAutoDraw(False)
+           
             
         waitOnFlip = False
         # *key_resp* updates
