@@ -54,6 +54,7 @@ Note that, because PsychoPy does fancy stuff with locking stimulus presentation 
 | Congruent stim | 100, 020, 003 |
 | Incongruent stim | 221, 331 <br> 212, 313 <br> 112, 211 <br> 332, 233 <br> 311, 131 <br> 322, 232 |
 | Grating stim | Square, phase 0.0, spatial frequency 3 |
+| MEG event marker names | Condition: CONG/INCONG<br>Button: BUTTON_1, BUTTON_2, BUTTON_3<br>Performance: Correct|
 
 Note that:
 * It's possible for the same two triplets to appear in a row (e.g., fixation -> '100' -> blank -> fixation -> '100')
